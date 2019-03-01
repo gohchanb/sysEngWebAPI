@@ -30,5 +30,5 @@ def getDetectionData():
     classes = [classes]
     return jsonify({'boxes' : boxes, 'scores' : scores, 'classes' : classes, 'num' : 200})
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=true)
