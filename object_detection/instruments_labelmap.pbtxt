@@ -1,0 +1,9 @@
+item {
+  id: 1
+  name: 'forceps_straight'
+}
+
+item {
+  id: 2
+  name: 'forceps_curved'
+}
