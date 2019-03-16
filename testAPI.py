@@ -21,12 +21,18 @@ def getDetectionData():
     frame = np.asarray(frame_in_json)
 
     boxes = [[0.0]*4]*200
-    boxes[0] = [0.25,0.25,0.75,0.75]
+    boxes[0] = [0.18,0.05,0.9,0.35]
+    boxes[1] = [0.2,0.4,0.99,0.67]
+    boxes[2] = [0.09,0.74,0.93,0.92]
     boxes = [boxes]
     scores = [0.0]*200
     scores[0] = 0.7
+    # scores[1] = 0.7
+    scores[2] = 0.7
     scores = [scores]
     classes = [1.0]*200
+    classes[1] = 2.0
+    classes[2] = 3.0
     classes = [classes]
     return jsonify({'boxes' : boxes, 'scores' : scores, 'classes' : classes, 'num' : 200})
 
