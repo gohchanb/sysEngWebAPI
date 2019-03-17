@@ -116,14 +116,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     boxes[2] = [0.09,0.74,0.93,0.92]
                     boxes = [boxes]
                     scores = [0.0]*200
-                    scores[0] = 0.7
-                    # scores[1] = 0.7
-                    scores[2] = 0.7
-                    boxes[0] = [0.15,0.7,0.9,0.89]
-                    boxes[1] = [0.1,0.35,0.90,0.62]
-                    boxes[2] = [0.15,0.11,0.95,0.3]
-                    boxes = [boxes]
-                    scores = [0.0]*200
                     scores[0] = 0.9
                     scores[1] = 0.9
                     scores[2] = 0.9
