@@ -4,6 +4,29 @@ import numpy as np
 
 import socket
 
+MODEL_NAME = 'object_detection/instruments_graph'
+
+CWD_PATH = os.getcwd()
+PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
+
+detection_graph = tf.Graph()
+with detection_graph.as_default():
+    od_graph_def = tf.GraphDef()
+    with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
+        serialized_graph = fid.read()
+        od_graph_def.ParseFromString(serialized_graph)
+        tf.import_graph_def(od_graph_def, name='')
+
+    sess = tf.Session(graph=detection_graph)
+
+image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
+detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+
+sessData = [detection_boxes, detection_scores, detection_classes, num_detections]
+
 def recieveDataOfSize(conn,size):
     byteCount = 0
     fullData = ''.encode('utf-8')
@@ -18,7 +41,8 @@ def recieveDataOfSize(conn,size):
             conn.sendall(msg.encode('utf-8'))
             fail = 1
             break
-    print(np.frombuffer(fullImage,dtype=int))
+    # print(np.frombuffer(fullData,dtype='uint8'))
+    # print(fullData)
     if byteCount!=size:
         fail = 1
         msg = 'ERROR sent too much data'
@@ -43,14 +67,16 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             if text.startswith('SIZE'):
                 t = text.split(' ')
                 size = int(t[1])
-                print("got size "+t[1])
+                shape = (int(t[2]),int(t[3]),3)
+                print("got size "+t[1]+" and shape ("+t[2]+", "+t[3]+", 3)")
                 msg = 'GOT SIZE'
+
                 conn.sendall(msg.encode('utf-8'))
 
                 fullImage, fail = recieveDataOfSize(conn, size)
 
                 if not fail:
-                    frame = np.frombuffer(fullImage,dtype=int)
+                    frame = np.frombuffer(fullImage,dtype=int).reshape(shape)
                     msg = 'GOT IMAGE'
                     conn.sendall(msg.encode('utf-8'))
                     # conn.sendall(data)
