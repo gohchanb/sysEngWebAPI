@@ -115,15 +115,18 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     boxes[1] = [0.2,0.4,0.99,0.67]
                     boxes[2] = [0.09,0.74,0.93,0.92]
                     boxes = [boxes]
+                    boxes = np.asarray(boxes)
                     scores = [0.0]*200
                     scores[0] = 0.9
                     scores[1] = 0.9
                     scores[2] = 0.9
                     scores = [scores]
+                    scores = np.asarray(scores)
                     classes = [1.0]*200
                     classes[1] = 2.0
                     classes[2] = 3.0
                     classes = [classes]
+                    classes = np.asarray(classes)
 
                     if not sendData(conn, boxes):
                         print('ERROR in sending boxes')
