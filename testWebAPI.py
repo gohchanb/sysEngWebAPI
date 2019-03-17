@@ -79,6 +79,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
                 if not fail:
                     frame = np.frombuffer(fullImage,dtype=int).reshape(shape)
+
+                    boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
                     msg = 'GOT IMAGE'
                     conn.sendall(msg.encode('utf-8'))
                     # conn.sendall(data)
