@@ -50,7 +50,42 @@ def recieveDataOfSize(conn,size):
         msg = 'ERROR sent too much data'
         conn.sendall(msg.encode('utf-8'))
 
-    return fullData, fail
+def shapeToString(shape):
+    s = ''
+    for i in shape:
+        s += str(i)+','
+    return s[:-1]
+
+def stringToShape(s):
+    shape = ()
+    nums = s.split(',')
+    for i in nums:
+        shape += (int(nums),)
+    return shape
+
+# def sendData(conn, data):
+#     dataBytes = data.tostring()
+#     size = len(dataBytes)
+#     fullData = ''.encode('utf-8')
+#     fail = 0
+#     while byteCount<size:
+#         data = conn.recv(size)
+#         byteCount += len(data)
+#         fullData += data
+#         print(byteCount)
+#         if not data:
+#             msg = 'ERROR did not get full Image'
+#             conn.sendall(msg.encode('utf-8'))
+#             fail = 1
+#             break
+#     # print(np.frombuffer(fullData,dtype='uint8'))
+#     # print(fullData)
+#     if byteCount!=size:
+#         fail = 1
+#         msg = 'ERROR sent too much data'
+#         conn.sendall(msg.encode('utf-8'))
+#
+#     return fullData, fail
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
@@ -69,10 +104,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             if text.startswith('SIZE'):
                 t = text.split(' ')
                 size = int(t[1])
-                shape = (int(t[2]),int(t[3]),3)
-                print("got size "+t[1]+" and shape ("+t[2]+", "+t[3]+", 3)")
-                msg = 'GOT SIZE'
+                shape = stringToShape(t[2])
+                print("got size "+t[1]+" and shape "+str(shape))
 
+                msg = 'GOT SIZE'
                 conn.sendall(msg.encode('utf-8'))
 
                 fullImage, fail = recieveDataOfSize(conn, size)
@@ -81,6 +116,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     frame = np.frombuffer(fullImage,dtype=int).reshape(shape)
 
                     boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
+
                     msg = 'GOT IMAGE'
                     conn.sendall(msg.encode('utf-8'))
                     # conn.sendall(data)
