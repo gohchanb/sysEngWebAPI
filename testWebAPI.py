@@ -96,6 +96,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             while True:
                 data = conn.recv(1024)
                 if not data:
+                    print('clossing connection with ', addr)
                     break
                 text = data.decode('utf-8')
                     # print(text)
