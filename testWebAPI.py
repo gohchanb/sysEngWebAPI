@@ -109,7 +109,30 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 if not fail:
                     frame = np.frombuffer(fullImage,dtype='uint8').reshape(shape)
 
-                    boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
+                    # boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
+                    boxes = [[0.0]*4]*200
+                    boxes[0] = [0.18,0.05,0.9,0.35]
+                    boxes[1] = [0.2,0.4,0.99,0.67]
+                    boxes[2] = [0.09,0.74,0.93,0.92]
+                    boxes = [boxes]
+                    scores = [0.0]*200
+                    scores[0] = 0.7
+                    # scores[1] = 0.7
+                    scores[2] = 0.7
+                    boxes[0] = [0.15,0.7,0.9,0.89]
+                    boxes[1] = [0.1,0.35,0.90,0.62]
+                    boxes[2] = [0.15,0.11,0.95,0.3]
+                    boxes = [boxes]
+                    scores = [0.0]*200
+                    scores[0] = 0.9
+                    scores[1] = 0.9
+                    scores[2] = 0.9
+                    scores = [scores]
+                    classes = [1.0]*200
+                    classes[1] = 2.0
+                    classes[2] = 3.0
+                    classes = [classes]
+
                     if not sendData(conn, boxes):
                         print('ERROR in sending boxes')
                     if not sendData(conn, classes):
