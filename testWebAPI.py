@@ -14,36 +14,51 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     conn, addr = s.accept()
     with conn:
         print('Connected by', addr)
+        while True:
+            data = conn.recv(1024)
+            text = data.decode('utf-8')
+                # print(text)
+            if text.startswith('SIZE'):
+                t = text.split(' ')
+                size = int(t[1])
+                print("got size "+t[1])
+                msg = 'GOT SIZE'
+                conn.sendall(msg.encode('utf-8'))
+
+                fullImage, fail = recieveImageOfSize(conn, size)
+
+                if not fail:
+                    frame = np.frombuffer(fullImage,dtype=int)
+                    msg = 'GOT IMAGE'
+                    conn.sendall(msg.encode('utf-8'))
+                    # conn.sendall(data)
+                # tAfter = time.time()
+                # print("Time main: " + str(tAfter-tBefore))
+            else:
+                msg = 'ERROR with initialising SIZE'
+                conn.sendall(msg.encode('utf-8'))
+
+def recieveImageOfSize(conn,size):
+    byteCount = 0
+    fullImage = ''.encode('utf-8')
+    fail = 0
+    while byteCount<size:
         data = conn.recv(size)
-        text = data.decode('utf-8')
-            # print(text)
-        if text.startswith('SIZE'):
-            t = text.split(' ')
-            size = int(t[1])
-            print("got size "+t[1])
-            msg = 'Got SIZE'
+        byteCount += len(data)
+        fullImage += data
+        print(byteCount)
+        if not data:
+            msg = 'ERROR did not get full Image'
             conn.sendall(msg.encode('utf-8'))
+            fail = 1
+            break
+    # print(np.frombuffer(fullImage,dtype=int))
+    if byteCount!=size:
+        fail = 1
+        msg = 'ERROR sent too much data'
+        conn.sendall(msg.encode('utf-8'))
 
-            tBefore = time.time()
-            byteCount = 0
-            fullImage = ''.encode('utf-8')
-            while byteCount<size:
-                data = conn.recv(size)
-                byteCount += len(data)
-                fullImage += data
-                print(byteCount)
-                if not data:
-                    break
-            print(np.frombuffer(fullImage,dtype=int))
-            msg = 'GOT IMAGE'
-            conn.sendall(msg.encode('utf-8'))
-                # conn.sendall(data)
-            tAfter = time.time()
-            print("Time main: " + str(tAfter-tBefore))
-        else:
-            msg = 'ERROR with initialising SIZE'
-            conn.sendall(msg.encode('utf-8'))
-
+    return fullImage, fail
 
 
 
