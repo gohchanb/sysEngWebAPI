@@ -95,6 +95,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print('Connected by', addr)
             while True:
                 data = conn.recv(1024)
+                if not data:
+                    break
                 text = data.decode('utf-8')
                     # print(text)
                 if text.startswith('SIZE'):
