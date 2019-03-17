@@ -64,29 +64,23 @@ def stringToShape(s):
         shape += (int(i),)
     return shape
 
-# def sendData(conn, data):
-#     dataBytes = data.tostring()
-#     size = len(dataBytes)
-#     fullData = ''.encode('utf-8')
-#     fail = 0
-#     while byteCount<size:
-#         data = conn.recv(size)
-#         byteCount += len(data)
-#         fullData += data
-#         print(byteCount)
-#         if not data:
-#             msg = 'ERROR did not get full Image'
-#             conn.sendall(msg.encode('utf-8'))
-#             fail = 1
-#             break
-#     # print(np.frombuffer(fullData,dtype='uint8'))
-#     # print(fullData)
-#     if byteCount!=size:
-#         fail = 1
-#         msg = 'ERROR sent too much data'
-#         conn.sendall(msg.encode('utf-8'))
-#
-#     return fullData, fail
+def sendData(conn, data):
+    shape = data.shape
+    dataBytes = data.tostring()
+    size = len(dataBytes)
+
+    msg = "SIZE %s %s" % (size, shapeToString(shape))
+    s.sendall(msg.encode('utf-8'))
+
+    data = s.recv(1024)
+    if(data.decode('utf-8')=='GOT SIZE'):
+        # print(frame)
+        s.sendall(dataBytes)
+        data = s.recv(1024)
+        if(data.decode('utf-8')=='GOT DATA'):
+            return 1
+        else:
+            return 0
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
