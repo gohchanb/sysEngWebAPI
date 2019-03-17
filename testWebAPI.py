@@ -88,86 +88,59 @@ PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
-    s.listen()
-    conn, addr = s.accept()
-    with conn:
-        print('Connected by', addr)
-        while True:
-            data = conn.recv(1024)
-            text = data.decode('utf-8')
-                # print(text)
-            if text.startswith('SIZE'):
-                t = text.split(' ')
-                size = int(t[1])
-                shape = stringToShape(t[2])
-                print("got size "+t[1]+" and shape "+str(shape))
+    while True:
+        s.listen()
+        conn, addr = s.accept()
+        with conn:
+            print('Connected by', addr)
+            while True:
+                data = conn.recv(1024)
+                text = data.decode('utf-8')
+                    # print(text)
+                if text.startswith('SIZE'):
+                    t = text.split(' ')
+                    size = int(t[1])
+                    shape = stringToShape(t[2])
+                    print("got size "+t[1]+" and shape "+str(shape))
 
-                msg = 'GOT SIZE'
-                conn.sendall(msg.encode('utf-8'))
+                    msg = 'GOT SIZE'
+                    conn.sendall(msg.encode('utf-8'))
 
-                fullImage, fail = recieveDataOfSize(conn, size)
+                    fullImage, fail = recieveDataOfSize(conn, size)
 
-                if not fail:
-                    frame = np.frombuffer(fullImage,dtype='uint8').reshape(shape)
-                    print(frame)
-                    # boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
-                    boxes = [[0.0]*4]*200
-                    boxes[0] = [0.18,0.05,0.9,0.35]
-                    boxes[1] = [0.2,0.4,0.99,0.67]
-                    boxes[2] = [0.09,0.74,0.93,0.92]
-                    boxes = [boxes]
-                    boxes = np.asarray(boxes)
-                    scores = [0.0]*200
-                    scores[0] = 0.9
-                    scores[1] = 0.9
-                    scores[2] = 0.9
-                    scores = [scores]
-                    scores = np.asarray(scores)
-                    classes = [1.0]*200
-                    classes[1] = 2.0
-                    classes[2] = 3.0
-                    classes = [classes]
-                    classes = np.asarray(classes)
+                    if not fail:
+                        frame = np.frombuffer(fullImage,dtype='uint8').reshape(shape)
+                        print(frame)
+                        # boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
+                        boxes = [[0.0]*4]*200
+                        boxes[0] = [0.18,0.05,0.9,0.35]
+                        boxes[1] = [0.2,0.4,0.99,0.67]
+                        boxes[2] = [0.09,0.74,0.93,0.92]
+                        boxes = [boxes]
+                        boxes = np.asarray(boxes)
+                        scores = [0.0]*200
+                        scores[0] = 0.9
+                        scores[1] = 0.9
+                        scores[2] = 0.9
+                        scores = [scores]
+                        scores = np.asarray(scores)
+                        classes = [1.0]*200
+                        classes[1] = 2.0
+                        classes[2] = 3.0
+                        classes = [classes]
+                        classes = np.asarray(classes)
 
-                    if not sendData(conn, boxes):
-                        print('ERROR in sending boxes')
-                    if not sendData(conn, classes):
-                        print('ERROR in sending data')
-                    if not sendData(conn, scores):
-                        print('ERROR in sending scores')
-                    # msg = 'GOT IMAGE'
-                    # conn.sendall(msg.encode('utf-8'))
-                    # conn.sendall(data)
-                # tAfter = time.time()
-                # print("Time main: " + str(tAfter-tBefore))
-            else:
-                msg = 'ERROR with initialising SIZE'
-                conn.sendall(msg.encode('utf-8'))
-
-
-
-# @app.route('/getDetectionData', methods = ['GET'])
-# def getDetectionData():
-#
-#     data = request.get_json()
-#     frame_in_json = data['data']
-#     frame = np.asarray(frame_in_json)
-#
-#     boxes = [[0.0]*4]*200
-#     boxes[0] = [0.18,0.05,0.9,0.35]
-#     boxes[1] = [0.2,0.4,0.99,0.67]
-#     boxes[2] = [0.09,0.74,0.93,0.92]
-#     boxes = [boxes]
-#     scores = [0.0]*200
-#     scores[0] = 0.7
-#     # scores[1] = 0.7
-#     scores[2] = 0.7
-#     scores = [scores]
-#     classes = [1.0]*200
-#     classes[1] = 2.0
-#     classes[2] = 3.0
-#     classes = [classes]
-#     return jsonify({'boxes' : boxes, 'scores' : scores, 'classes' : classes, 'num' : 200})
-#
-# if __name__ == "__main__":
-#     app.run(host='0.0.0.0',debug=True)
+                        if not sendData(conn, boxes):
+                            print('ERROR in sending boxes')
+                        if not sendData(conn, classes):
+                            print('ERROR in sending data')
+                        if not sendData(conn, scores):
+                            print('ERROR in sending scores')
+                        # msg = 'GOT IMAGE'
+                        # conn.sendall(msg.encode('utf-8'))
+                        # conn.sendall(data)
+                    # tAfter = time.time()
+                    # print("Time main: " + str(tAfter-tBefore))
+                else:
+                    msg = 'ERROR with initialising SIZE'
+                    conn.sendall(msg.encode('utf-8'))
