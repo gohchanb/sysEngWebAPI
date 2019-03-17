@@ -65,18 +65,19 @@ def stringToShape(s):
     return shape
 
 def sendData(conn, data):
+    print('sending:' + str(data))
     shape = data.shape
     dataBytes = data.tostring()
     size = len(dataBytes)
 
     msg = "SIZE %s %s" % (size, shapeToString(shape))
-    s.sendall(msg.encode('utf-8'))
+    conn.sendall(msg.encode('utf-8'))
 
-    data = s.recv(1024)
+    data = conn.recv(1024)
     if(data.decode('utf-8')=='GOT SIZE'):
         # print(frame)
-        s.sendall(dataBytes)
-        data = s.recv(1024)
+        conn.sendall(dataBytes)
+        data = conn.recv(1024)
         if(data.decode('utf-8')=='GOT DATA'):
             return 1
         else:
@@ -108,7 +109,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
                 if not fail:
                     frame = np.frombuffer(fullImage,dtype='uint8').reshape(shape)
-
+                    print(frame)
                     # boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
                     boxes = [[0.0]*4]*200
                     boxes[0] = [0.18,0.05,0.9,0.35]
