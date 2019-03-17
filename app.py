@@ -9,7 +9,7 @@ from flask import jsonify
 from flask import request
 
 # Detection Imports
-from object_detection.detectionAlgorithm import *
+#from object_detection.detectionAlgorithm import *
 
 MODEL_NAME = 'object_detection/instruments_graph'
 
@@ -48,7 +48,7 @@ def getDetectionData():
     frame_in_json = data['data']
     frame = np.asarray(frame_in_json)
 
-    (boxes, scores, classes, num) = runDetectionModel(frame, image_tensor, sess, sessData)
+    boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
     #print(num.tolist())
     return jsonify({'boxes' : boxes.tolist(), 'scores' : scores.tolist(), 'classes' : classes.tolist(), 'num' : num.tolist()})
 
