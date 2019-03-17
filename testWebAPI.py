@@ -25,7 +25,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 msg = 'GOT SIZE'
                 conn.sendall(msg.encode('utf-8'))
 
-                fullImage, fail = recieveImageOfSize(conn, size)
+                fullImage, fail = recieveDataOfSize(conn, size)
 
                 if not fail:
                     frame = np.frombuffer(fullImage,dtype=int)
@@ -38,14 +38,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 msg = 'ERROR with initialising SIZE'
                 conn.sendall(msg.encode('utf-8'))
 
-def recieveImageOfSize(conn,size):
+def recieveDataOfSize(conn,size):
     byteCount = 0
-    fullImage = ''.encode('utf-8')
+    fullData = ''.encode('utf-8')
     fail = 0
     while byteCount<size:
         data = conn.recv(size)
         byteCount += len(data)
-        fullImage += data
+        fullData += data
         print(byteCount)
         if not data:
             msg = 'ERROR did not get full Image'
@@ -58,7 +58,7 @@ def recieveImageOfSize(conn,size):
         msg = 'ERROR sent too much data'
         conn.sendall(msg.encode('utf-8'))
 
-    return fullImage, fail
+    return fullData, fail
 
 
 
