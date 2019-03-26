@@ -3,6 +3,7 @@ import selectors
 import json
 import io
 import struct
+import numpy as np
 
 request_search = {
     "morpheus": "Follow the white rabbit. \U0001f430",
