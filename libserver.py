@@ -94,6 +94,11 @@ class Message:
             query = self.request.get("value")
             answer = request_search.get(query) or f'No match for "{query}".'
             content = {"result": answer}
+        elif action == "frame":
+            frame = self.request.get("frame")
+            shape = self.request.get("shape")
+            # answer = request_search.get(query) or f'No match for "{query}".'
+            content = {"result": "Frame: "+str(frame)+", with shape:"+str(shape)}
         else:
             content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"
