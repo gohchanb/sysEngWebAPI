@@ -129,7 +129,7 @@ class Message:
             classes = [classes]
             classes = np.asarray(classes)
 
-            content = {"boxes": boxes.tostring(), "boxes_shape": boxes.shape, "classes": classes.tostring(), "classes_shape": classes.shape,"scores": scores.tostring(), "scores_shape": scores.shape}
+            content = {"boxes": boxes.tostring(), "boxes_shape": shapeToString(boxes.shape), "classes": classes.tostring(), "classes_shape": shapeToString(classes.shape),"scores": scores.tostring(), "scores_shape": shapeToString(scores.shape)}
         else:
             content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"
