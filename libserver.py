@@ -10,6 +10,11 @@ request_search = {
     "\U0001f436": "\U0001f43e Playing ball! \U0001f3d0",
 }
 
+def shapeToString(shape):
+    s = ''
+    for i in shape:
+        s += str(i)+','
+    return s[:-1]
 
 class Message:
     def __init__(self, selector, sock, addr):
@@ -105,7 +110,25 @@ class Message:
             frame = self.request.get("frame")
             shape = self.request.get("shape")
             # answer = request_search.get(query) or f'No match for "{query}".'
-            content = {"result": "Frame: "+str(frame)+", with shape:"+str(shape)}
+            boxes = [[0.0]*4]*200
+            boxes[0] = [0.18,0.05,0.9,0.35]
+            boxes[1] = [0.2,0.4,0.99,0.67]
+            boxes[2] = [0.09,0.74,0.93,0.92]
+            boxes = [boxes]
+            boxes = np.asarray(boxes)
+            scores = [0.0]*200
+            scores[0] = 0.9
+            scores[1] = 0.9
+            scores[2] = 0.9
+            scores = [scores]
+            scores = np.asarray(scores)
+            classes = [1.0]*200
+            classes[1] = 2.0
+            classes[2] = 3.0
+            classes = [classes]
+            classes = np.asarray(classes)
+
+            content = {"boxes": boxes.tostring(), "boxes_shape": boxes.shape, "classes": classes.tostring(), "classes_shape": classes.shape,"scores": scores.tostring(), "scores_shape": scores.shape}
         else:
             content = {"result": f'Error: invalid action "{action}".'}
         content_encoding = "utf-8"
