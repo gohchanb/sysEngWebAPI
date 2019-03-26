@@ -61,7 +61,14 @@ class Message:
                 self._send_buffer = self._send_buffer[sent:]
                 # Close when the buffer is drained. The response has been sent.
                 if sent and not self._send_buffer:
-                    self.close()
+                    self._recv_buffer = b""
+                    self._send_buffer = b""
+                    self._jsonheader_len = None
+                    self.jsonheader = None
+                    self.request = None
+                    self.response_created = False
+                    self._set_selector_events_mask("r")
+                    # self.close()
 
     def _json_encode(self, obj, encoding):
         return json.dumps(obj, ensure_ascii=False).encode(encoding)
