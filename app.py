@@ -40,7 +40,7 @@ try:
                 except Exception:
                     print(
                         "main: error: exception for",
-                        f"{message.addr}:\n{traceback.format_exc()}",
+                        f"{message.addr}:\n{traceback.format_exc()}"
                     )
                     message.close()
 except KeyboardInterrupt:
