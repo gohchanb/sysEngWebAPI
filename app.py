@@ -1,56 +1,53 @@
-import os
-import cv2
+#!/usr/bin/env python3
 import numpy as np
-import tensorflow as tf
+import sys
+import socket
+import selectors
+import traceback
 
-# FLASK imports
-from flask import Flask
-from flask import jsonify
-from flask import request
+import libserver
 
-# Detection Imports
-#from object_detection.detectionAlgorithm import *
+sel = selectors.DefaultSelector()
 
-MODEL_NAME = 'object_detection/instruments_graph'
-
-CWD_PATH = os.getcwd()
-PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
-
-detection_graph = tf.Graph()
-with detection_graph.as_default():
-    od_graph_def = tf.GraphDef()
-    with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
-        serialized_graph = fid.read()
-        od_graph_def.ParseFromString(serialized_graph)
-        tf.import_graph_def(od_graph_def, name='')
-
-    sess = tf.Session(graph=detection_graph)
-
-image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
-detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
-num_detections = detection_graph.get_tensor_by_name('num_detections:0')
-
-sessData = [detection_boxes, detection_scores, detection_classes, num_detections]
-
-app = Flask(__name__)
+def accept_wrapper(sock):
+    conn, addr = sock.accept()  # Should be ready to read
+    print("accepted connection from", addr)
+    conn.setblocking(False)
+    message = libserver.Message(sel, conn, addr)
+    sel.register(conn, selectors.EVENT_READ, data=message)
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+if len(sys.argv) != 3:
+    print("usage:", sys.argv[0], "<host> <port>")
+    sys.exit(1)
 
-@app.route('/getDetectionData', methods = ['GET'])
-def getDetectionData():
+host, port = sys.argv[1], int(sys.argv[2])
+lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Avoid bind() exception: OSError: [Errno 48] Address already in use
+lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+lsock.bind((host, port))
+lsock.listen()
+print("listening on", (host, port))
+lsock.setblocking(False)
+sel.register(lsock, selectors.EVENT_READ, data=None)
 
-    data = request.get_json()
-    frame_in_json = data['data']
-    frame = np.asarray(frame_in_json)
-
-    boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
-    #print(num.tolist())
-    return jsonify({'boxes' : boxes.tolist(), 'scores' : scores.tolist(), 'classes' : classes.tolist(), 'num' : num.tolist()})
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0',debug=True)
+try:
+    while True:
+        events = sel.select(timeout=None)
+        for key, mask in events:
+            if key.data is None:
+                accept_wrapper(key.fileobj)
+            else:
+                message = key.data
+                try:
+                    message.process_events(mask)
+                except Exception:
+                    print(
+                        "main: error: exception for",
+                        f"{message.addr}:\n{traceback.format_exc()}",
+                    )
+                    message.close()
+except KeyboardInterrupt:
+    print("caught keyboard interrupt, exiting")
+finally:
+    sel.close()
