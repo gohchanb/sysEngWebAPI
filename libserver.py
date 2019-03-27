@@ -41,10 +41,10 @@ class Message:
             raise ValueError(f"Invalid events mask mode {repr(mode)}.")
         self.selector.modify(self.sock, events, data=self)
 
-    def _read(self):
+    def _read(self, maxLength = 4096):
         try:
             # Should be ready to read
-            data = self.sock.recv(4096)
+            data = self.sock.recv(maxLength)
         except BlockingIOError:
             # Resource temporarily unavailable (errno EWOULDBLOCK)
             pass
@@ -156,7 +156,11 @@ class Message:
             self.write()
 
     def read(self):
-        self._read()
+        if 'content-length' in self.jsonheader:
+            print(self.jsonheader.get('content-length'))
+            self.read(self.jsonheader.get('content-length'))
+        else:
+            self._read()
 
         if self._jsonheader_len is None:
             self.process_protoheader()
