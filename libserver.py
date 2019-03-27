@@ -44,6 +44,7 @@ class Message:
     def _read(self, maxLength = 4096):
         try:
             # Should be ready to read
+            # print("reading from", self.addr)
             data = self.sock.recv(maxLength)
         except BlockingIOError:
             # Resource temporarily unavailable (errno EWOULDBLOCK)
@@ -56,7 +57,7 @@ class Message:
 
     def _write(self):
         if self._send_buffer:
-            print("sending", repr(self._send_buffer), "to", self.addr)
+            print("sending detection data to", self.addr)
             try:
                 # Should be ready to write
                 sent = self.sock.send(self._send_buffer)
@@ -156,20 +157,25 @@ class Message:
             self.write()
 
     def read(self):
-        if 'content-length' in self.jsonheader:
-            print(self.jsonheader.get('content-length'))
-            self.read(self.jsonheader.get('content-length'))
-        else:
+        # print(self.jsonheader)
+        if self.jsonheader is None:
             self._read()
+        else:
+            print(self.jsonheader.get('content-length'))
+            self._read(maxLength = self.jsonheader.get('content-length'))
 
         if self._jsonheader_len is None:
+            # print('processing header length')
             self.process_protoheader()
 
         if self._jsonheader_len is not None:
+            print(self._jsonheader_len)
             if self.jsonheader is None:
+                print(self._recv_buffer)
                 self.process_jsonheader()
 
         if self.jsonheader:
+            print(self.jsonheader)
             if self.request is None:
                 self.process_request()
 
@@ -215,6 +221,7 @@ class Message:
             self.jsonheader = self._json_decode(
                 self._recv_buffer[:hdrlen], "utf-8"
             )
+            print(self.jsonheader)
             self._recv_buffer = self._recv_buffer[hdrlen:]
             for reqhdr in (
                 "byteorder",
@@ -234,7 +241,7 @@ class Message:
         if self.jsonheader["content-type"] == "text/json":
             encoding = self.jsonheader["content-encoding"]
             self.request = self._json_decode(data, encoding)
-            print("received request", repr(self.request), "from", self.addr)
+            print("received request frame from", self.addr)
         else:
             # Binary or unknown content-type
             self.request = data
