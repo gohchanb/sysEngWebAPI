@@ -92,7 +92,6 @@ class Message:
 
     def _create_response_json_content(self):
         frame = self.request.get("frame")
-        shape = self.request.get("shape")
         # answer = request_search.get(query) or f'No match for "{query}".'
         boxes = [[0.0]*4]*200
         boxes[0] = [0.18,0.05,0.9,0.35]
