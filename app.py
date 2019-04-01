@@ -16,7 +16,7 @@ def accept_wrapper(sock):
     message = libserver.Message(sel, conn, addr)
     sel.register(conn, selectors.EVENT_READ, data=message)
 
-host, port = '127.0.0.1', 65432
+host, port = '0.0.0.0', 8000
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Avoid bind() exception: OSError: [Errno 48] Address already in use
 lsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
