@@ -11,12 +11,6 @@ request_search = {
     "\U0001f436": "\U0001f43e Playing ball! \U0001f3d0",
 }
 
-def shapeToString(shape):
-    s = ''
-    for i in shape:
-        s += str(i)+','
-    return s[:-1]
-
 class Message:
     def __init__(self, selector, sock, addr):
         self.selector = selector
