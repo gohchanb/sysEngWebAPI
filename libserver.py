@@ -163,13 +163,13 @@ class Message:
             self.process_protoheader()
 
         if self._jsonheader_len is not None:
-            print(self._jsonheader_len)
+            # print(self._jsonheader_len)
             if self.jsonheader is None:
-                print(self._recv_buffer)
+                # print(self._recv_buffer)
                 self.process_jsonheader()
 
         if self.jsonheader:
-            print(self.jsonheader)
+            # print(self.jsonheader)
             if self.request is None:
                 self.process_request()
 
@@ -215,7 +215,7 @@ class Message:
             self.jsonheader = self._json_decode(
                 self._recv_buffer[:hdrlen], "utf-8"
             )
-            print(self.jsonheader)
+            # print(self.jsonheader)
             self._recv_buffer = self._recv_buffer[hdrlen:]
             for reqhdr in (
                 "byteorder",
@@ -235,7 +235,7 @@ class Message:
         if self.jsonheader["content-type"] == "text/json":
             encoding = self.jsonheader["content-encoding"]
             self.request = self._json_decode(data, encoding)
-            print("received request frame from", self.addr)
+            # print("received request frame from", self.addr)
         else:
             # Binary or unknown content-type
             self.request = data
