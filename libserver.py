@@ -217,8 +217,8 @@ class Message:
         if self.jsonheader["content-type"] == "text/json":
             response = self._create_response_json_content()
         else:
-            # Binary or unknown content-type
-            response = self._create_response_binary_content()
+            print('Wrong content type')
+            self.close()
         message = self._create_message(**response)
         self.response_created = True
         self._send_buffer += message
