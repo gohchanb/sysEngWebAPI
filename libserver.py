@@ -129,25 +129,19 @@ class Message:
             self.write()
 
     def read(self):
-        # print(self.jsonheader)
         if self.jsonheader is None:
             self._read()
         else:
-            # print(self.jsonheader.get('content-length'))
             self._read(maxLength = self.jsonheader.get('content-length'))
 
         if self._jsonheader_len is None:
-            # print('processing header length')
             self.process_protoheader()
 
         if self._jsonheader_len is not None:
-            # print(self._jsonheader_len)
             if self.jsonheader is None:
-                # print(self._recv_buffer)
                 self.process_jsonheader()
 
         if self.jsonheader:
-            # print(self.jsonheader)
             if self.request is None:
                 self.process_request()
 
