@@ -207,14 +207,9 @@ class Message:
         if self.jsonheader["content-type"] == "text/json":
             encoding = self.jsonheader["content-encoding"]
             self.request = self._json_decode(data, encoding)
-            # print("received request frame from", self.addr)
         else:
-            # Binary or unknown content-type
-            self.request = data
-            print(
-                f'received {self.jsonheader["content-type"]} request from',
-                self.addr,
-            )
+            print('Wrong content type')
+            self.close()
         # Set selector to listen for write events, we're done reading.
         self._set_selector_events_mask("w")
 
