@@ -16,7 +16,6 @@ def accept_wrapper(sock):
     message = libserver.Message(sel, conn, addr)
     sel.register(conn, selectors.EVENT_READ, data=message)
 
-
 host, port = '127.0.0.1', 65432
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Avoid bind() exception: OSError: [Errno 48] Address already in use
@@ -40,7 +39,7 @@ try:
                 except Exception:
                     print(
                         "main: error: exception for",
-                        f"{message.addr}:\n{traceback.format_exc()}"
+                        f"{message.addr}:\n{traceback.format_exc()}",
                     )
                     message.close()
 except KeyboardInterrupt:
