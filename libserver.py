@@ -57,7 +57,7 @@ class Message:
 
     def _write(self):
         if self._send_buffer:
-            print("sending detection data to", self.addr)
+            # print("sending detection data to", self.addr)
             try:
                 # Should be ready to write
                 sent = self.sock.send(self._send_buffer)
@@ -161,7 +161,7 @@ class Message:
         if self.jsonheader is None:
             self._read()
         else:
-            print(self.jsonheader.get('content-length'))
+            # print(self.jsonheader.get('content-length'))
             self._read(maxLength = self.jsonheader.get('content-length'))
 
         if self._jsonheader_len is None:
