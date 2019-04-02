@@ -5,7 +5,7 @@ import socket
 import selectors
 import traceback
 
-import libserver
+import libservertest
 
 sel = selectors.DefaultSelector()
 
