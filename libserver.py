@@ -4,6 +4,7 @@ import json
 import io
 import struct
 import numpy as np
+import os
 import tensorflow as tf
 
 MODEL_NAME = 'object_detection/instruments_graph'
