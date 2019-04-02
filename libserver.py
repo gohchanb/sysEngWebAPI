@@ -4,6 +4,31 @@ import json
 import io
 import struct
 import numpy as np
+import tensorflow as tf
+
+MODEL_NAME = 'object_detection/instruments_graph'
+
+CWD_PATH = os.getcwd()
+PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
+
+detection_graph = tf.Graph()
+with detection_graph.as_default():
+    od_graph_def = tf.GraphDef()
+    with tf.gfile.GFile(PATH_TO_CKPT, 'rb') as fid:
+        serialized_graph = fid.read()
+        od_graph_def.ParseFromString(serialized_graph)
+        tf.import_graph_def(od_graph_def, name='')
+
+    sess = tf.Session(graph=detection_graph)
+
+image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
+detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+
+sessData = [detection_boxes, detection_scores, detection_classes, num_detections]
+
 
 class Message:
     def __init__(self, selector, sock, addr):
@@ -91,25 +116,11 @@ class Message:
         return message
 
     def _create_response_json_content(self):
-        frame = self.request.get("frame")
+        frame_as_list = self.request.get("frame")
         # answer = request_search.get(query) or f'No match for "{query}".'
-        boxes = [[0.0]*4]*200
-        boxes[0] = [0.18,0.05,0.9,0.35]
-        boxes[1] = [0.2,0.4,0.99,0.67]
-        boxes[2] = [0.09,0.74,0.93,0.92]
-        boxes = [boxes]
-        boxes = np.asarray(boxes)
-        scores = [0.0]*200
-        scores[0] = 0.9
-        scores[1] = 0.9
-        scores[2] = 0.9
-        scores = [scores]
-        scores = np.asarray(scores)
-        classes = [1.0]*200
-        classes[1] = 2.0
-        classes[2] = 3.0
-        classes = [classes]
-        classes = np.asarray(classes)
+        frame = np.asarray(frame_in_json)
+
+        boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
 
         content = {"boxes": boxes.tolist(), "classes": classes.tolist(),"scores": scores.tolist()}
 
