@@ -118,8 +118,8 @@ class Message:
         return message
 
     def _create_response_json_content(self):
-        tDisplayBefore = time.time()
-        
+        # tBefore = time.time()
+
         frame_as_list = self.request.get("frame")
         # answer = request_search.get(query) or f'No match for "{query}".'
         frame = np.asarray(frame_as_list)
@@ -128,8 +128,8 @@ class Message:
 
         content = {"boxes": boxes.tolist(), "classes": classes.tolist(),"scores": scores.tolist()}
 
-        tDisplayAfter = time.time()
-        print("Time Calculate: " + str(tDisplayAfter-tDisplayBefore))
+        # tAfter = time.time()
+        # print("Time Calculate: " + str(tAfter-tBefore))
 
         content_encoding = "utf-8"
         response = {
