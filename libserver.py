@@ -119,7 +119,7 @@ class Message:
     def _create_response_json_content(self):
         frame_as_list = self.request.get("frame")
         # answer = request_search.get(query) or f'No match for "{query}".'
-        frame = np.asarray(frame_in_json)
+        frame = np.asarray(frame_as_list)
 
         boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
 
