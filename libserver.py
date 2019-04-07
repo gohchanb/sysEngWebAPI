@@ -6,6 +6,7 @@ import struct
 import numpy as np
 import os
 import tensorflow as tf
+import time
 
 MODEL_NAME = 'object_detection/instruments_graph'
 
@@ -117,6 +118,8 @@ class Message:
         return message
 
     def _create_response_json_content(self):
+        # tBefore = time.time()
+
         frame_as_list = self.request.get("frame")
         # answer = request_search.get(query) or f'No match for "{query}".'
         frame = np.asarray(frame_as_list)
@@ -124,6 +127,9 @@ class Message:
         boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor: frame})
 
         content = {"boxes": boxes.tolist(), "classes": classes.tolist(),"scores": scores.tolist()}
+
+        # tAfter = time.time()
+        # print("Time Calculate: " + str(tAfter-tBefore))
 
         content_encoding = "utf-8"
         response = {
