@@ -149,7 +149,7 @@ class Message:
         if self.jsonheader is None:
             self._read()
         else:
-            self._read(maxLength = self.jsonheader.get('content-length'))
+            self._read(max_length = self.jsonheader.get('content-length'))
 
         if self._jsonheader_len is None:
             self.process_protoheader()
