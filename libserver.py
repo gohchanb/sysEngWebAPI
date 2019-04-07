@@ -10,7 +10,7 @@ import tensorflow as tf
 MODEL_NAME = 'object_detection/instruments_graph'
 
 CWD_PATH = os.getcwd()
-PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME,'frozen_inference_graph.pb')
+PATH_TO_CKPT = os.path.join(CWD_PATH, MODEL_NAME, 'frozen_inference_graph.pb')
 
 detection_graph = tf.Graph()
 with detection_graph.as_default():
@@ -55,11 +55,11 @@ class Message:
             raise ValueError(f"Invalid events mask mode {repr(mode)}.")
         self.selector.modify(self.sock, events, data=self)
 
-    def _read(self, maxLength = 4096):
+    def _read(self, max_length = 4096):
         try:
             # Should be ready to read
             # print("reading from", self.addr)
-            data = self.sock.recv(maxLength)
+            data = self.sock.recv(max_length)
         except BlockingIOError:
             # Resource temporarily unavailable (errno EWOULDBLOCK)
             pass
@@ -121,7 +121,7 @@ class Message:
         # answer = request_search.get(query) or f'No match for "{query}".'
         frame = np.asarray(frame_as_list)
 
-        boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor:frame})
+        boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor: frame})
 
         content = {"boxes": boxes.tolist(), "classes": classes.tolist(),"scores": scores.tolist()}
 

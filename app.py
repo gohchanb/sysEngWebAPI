@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import numpy as np
-import sys
 import socket
 import selectors
 import traceback
@@ -9,12 +7,14 @@ import libserver
 
 sel = selectors.DefaultSelector()
 
+
 def accept_wrapper(sock):
     conn, addr = sock.accept()  # Should be ready to read
     print("accepted connection from", addr)
     conn.setblocking(False)
     message = libserver.Message(sel, conn, addr)
     sel.register(conn, selectors.EVENT_READ, data=message)
+
 
 host, port = '0.0.0.0', 8000
 lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
