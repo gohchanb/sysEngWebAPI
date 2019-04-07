@@ -6,7 +6,6 @@ import struct
 import numpy as np
 import os
 import tensorflow as tf
-import time
 
 MODEL_NAME = 'object_detection/instruments_graph'
 
@@ -56,7 +55,7 @@ class Message:
             raise ValueError(f"Invalid events mask mode {repr(mode)}.")
         self.selector.modify(self.sock, events, data=self)
 
-    def _read(self, max_length = 4096):
+    def _read(self, max_length=4096):
         try:
             # Should be ready to read
             # print("reading from", self.addr)
@@ -92,10 +91,12 @@ class Message:
                     self._set_selector_events_mask("r")
                     # self.close()
 
-    def _json_encode(self, obj, encoding):
+    @staticmethod
+    def _json_encode(obj, encoding):
         return json.dumps(obj, ensure_ascii=False).encode(encoding)
 
-    def _json_decode(self, json_bytes, encoding):
+    @staticmethod
+    def _json_decode(json_bytes, encoding):
         tiow = io.TextIOWrapper(
             io.BytesIO(json_bytes), encoding=encoding, newline=""
         )
@@ -104,7 +105,7 @@ class Message:
         return obj
 
     def _create_message(
-        self, *, content_bytes, content_type, content_encoding
+            self, *, content_bytes, content_type, content_encoding
     ):
         jsonheader = {
             "byteorder": sys.byteorder,
@@ -126,7 +127,7 @@ class Message:
 
         boxes, scores, classes, num = sess.run(sessData, feed_dict={image_tensor: frame})
 
-        content = {"boxes": boxes.tolist(), "classes": classes.tolist(),"scores": scores.tolist()}
+        content = {"boxes": boxes.tolist(), "classes": classes.tolist(), "scores": scores.tolist()}
 
         # tAfter = time.time()
         # print("Time Calculate: " + str(tAfter-tBefore))
@@ -149,7 +150,7 @@ class Message:
         if self.jsonheader is None:
             self._read()
         else:
-            self._read(max_length = self.jsonheader.get('content-length'))
+            self._read(max_length=self.jsonheader.get('content-length'))
 
         if self._jsonheader_len is None:
             self.process_protoheader()
@@ -207,10 +208,10 @@ class Message:
             # print(self.jsonheader)
             self._recv_buffer = self._recv_buffer[hdrlen:]
             for reqhdr in (
-                "byteorder",
-                "content-length",
-                "content-type",
-                "content-encoding",
+                    "byteorder",
+                    "content-length",
+                    "content-type",
+                    "content-encoding",
             ):
                 if reqhdr not in self.jsonheader:
                     raise ValueError(f'Missing required header "{reqhdr}".')
@@ -236,6 +237,7 @@ class Message:
         else:
             print('Wrong content type')
             self.close()
+            return
         message = self._create_message(**response)
         self.response_created = True
         self._send_buffer += message

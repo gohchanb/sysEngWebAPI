@@ -5,6 +5,7 @@ import io
 import struct
 import numpy as np
 
+
 class Message:
     def __init__(self, selector, sock, addr):
         self.selector = selector
@@ -29,11 +30,11 @@ class Message:
             raise ValueError(f"Invalid events mask mode {repr(mode)}.")
         self.selector.modify(self.sock, events, data=self)
 
-    def _read(self, maxLength = 4096):
+    def _read(self, max_length=4096):
         try:
             # Should be ready to read
             # print("reading from", self.addr)
-            data = self.sock.recv(maxLength)
+            data = self.sock.recv(max_length)
         except BlockingIOError:
             # Resource temporarily unavailable (errno EWOULDBLOCK)
             pass
@@ -65,10 +66,12 @@ class Message:
                     self._set_selector_events_mask("r")
                     # self.close()
 
-    def _json_encode(self, obj, encoding):
+    @staticmethod
+    def _json_encode(obj, encoding):
         return json.dumps(obj, ensure_ascii=False).encode(encoding)
 
-    def _json_decode(self, json_bytes, encoding):
+    @staticmethod
+    def _json_decode(json_bytes, encoding):
         tiow = io.TextIOWrapper(
             io.BytesIO(json_bytes), encoding=encoding, newline=""
         )
@@ -77,7 +80,7 @@ class Message:
         return obj
 
     def _create_message(
-        self, *, content_bytes, content_type, content_encoding
+            self, *, content_bytes, content_type, content_encoding
     ):
         jsonheader = {
             "byteorder": sys.byteorder,
@@ -91,27 +94,27 @@ class Message:
         return message
 
     def _create_response_json_content(self):
-        frame = self.request.get("frame")
+        # frame = self.request.get("frame")
         # answer = request_search.get(query) or f'No match for "{query}".'
-        boxes = [[0.0]*4]*200
-        boxes[0] = [0.18,0.05,0.9,0.35]
-        boxes[1] = [0.2,0.4,0.99,0.67]
-        boxes[2] = [0.09,0.74,0.93,0.92]
+        boxes = [[0.0] * 4] * 200
+        boxes[0] = [0.18, 0.05, 0.9, 0.35]
+        boxes[1] = [0.2, 0.4, 0.99, 0.67]
+        boxes[2] = [0.09, 0.74, 0.93, 0.92]
         boxes = [boxes]
         boxes = np.asarray(boxes)
-        scores = [0.0]*200
+        scores = [0.0] * 200
         scores[0] = 0.9
         scores[1] = 0.9
         scores[2] = 0.9
         scores = [scores]
         scores = np.asarray(scores)
-        classes = [1.0]*200
+        classes = [1.0] * 200
         classes[1] = 2.0
         classes[2] = 3.0
         classes = [classes]
         classes = np.asarray(classes)
 
-        content = {"boxes": boxes.tolist(), "classes": classes.tolist(),"scores": scores.tolist()}
+        content = {"boxes": boxes.tolist(), "classes": classes.tolist(), "scores": scores.tolist()}
 
         content_encoding = "utf-8"
         response = {
@@ -131,7 +134,7 @@ class Message:
         if self.jsonheader is None:
             self._read()
         else:
-            self._read(maxLength = self.jsonheader.get('content-length'))
+            self._read(max_length=self.jsonheader.get('content-length'))
 
         if self._jsonheader_len is None:
             self.process_protoheader()
@@ -189,10 +192,10 @@ class Message:
             # print(self.jsonheader)
             self._recv_buffer = self._recv_buffer[hdrlen:]
             for reqhdr in (
-                "byteorder",
-                "content-length",
-                "content-type",
-                "content-encoding",
+                    "byteorder",
+                    "content-length",
+                    "content-type",
+                    "content-encoding",
             ):
                 if reqhdr not in self.jsonheader:
                     raise ValueError(f'Missing required header "{reqhdr}".')
@@ -218,6 +221,7 @@ class Message:
         else:
             print('Wrong content type')
             self.close()
+            return
         message = self._create_message(**response)
         self.response_created = True
         self._send_buffer += message
