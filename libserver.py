@@ -6,6 +6,7 @@ import struct
 import numpy as np
 import os
 import tensorflow as tf
+import time
 
 MODEL_NAME = 'object_detection/instruments_graph'
 
