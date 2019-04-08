@@ -59,7 +59,7 @@ class Message:
     def _read(self, max_length=4096):
         try:
             # Should be ready to read
-            print("reading from", self.addr)
+            # print("reading from", self.addr)
             data = self.sock.recv(max_length)
         except BlockingIOError:
             # Resource temporarily unavailable (errno EWOULDBLOCK)
@@ -72,7 +72,7 @@ class Message:
 
     def _write(self):
         if self._send_buffer:
-            print("sending detection data to", self.addr)
+            # print("sending detection data to", self.addr)
             try:
                 # Should be ready to write
                 sent = self.sock.send(self._send_buffer)
@@ -120,7 +120,7 @@ class Message:
         return message
 
     def _create_response_json_content(self):
-        tBefore = time.time()
+        # tBefore = time.time()
 
         frame_as_list = self.request.get("frame")
         # answer = request_search.get(query) or f'No match for "{query}".'
@@ -130,8 +130,8 @@ class Message:
 
         content = {"boxes": boxes.tolist(), "classes": classes.tolist(), "scores": scores.tolist()}
 
-        tAfter = time.time()
-        print("Time Calculate: " + str(tAfter-tBefore))
+        # tAfter = time.time()
+        # print("Time Calculate: " + str(tAfter-tBefore))
 
         content_encoding = "utf-8"
         response = {
